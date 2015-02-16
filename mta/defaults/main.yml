@@ -1,0 +1,25 @@
+root_email: false 
+mta_domain: false 
+mta_virtual: false
+mta_bounce_user: 'bounce'
+postfix_url_bounce: 'http://localhost/?email=_email_&type=_type_&reason=_reason_'
+
+postfix_mynetworks: []
+postfix_bounce_user: 'bounce'
+inet_interfaces: all
+
+opendkim_listen: 'localhost'
+opendkim_port: '10000'
+opendkim_daemon_opts: ''
+opendkim_selector: 'cook'
+
+# ------------------------
+# Please do not edit this
+# ------------------------
+opendkim_socket: "inet:{{ opendkim_port }}@{{ opendkim_listen }}"
+opendkim_dir: '/etc/opendkim'
+opendkim_keys_dir: '{{ opendkim_dir }}/keys'
+opendkim_domain_keys_dir: '{{ opendkim_keys_dir }}/{{ mta_domain }}'
+opendkim_private_key: '{{ opendkim_domain_keys_dir }}/{{ opendkim_selector }}.private'
+opendkim_txt_record: '{{ opendkim_domain_keys_dir }}/{{ opendkim_selector }}.txt'
+postfix_smtpd_milters: "inet:{{ opendkim_listen }}:{{ opendkim_port }}"

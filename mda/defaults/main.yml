@@ -1,0 +1,4 @@
+# Which scheme are supported ? Check with :
+# doveadm pw -l
+password_scheme: SHA512
+

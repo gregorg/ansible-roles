@@ -1,0 +1,9 @@
+user = postfixadmin
+password = {{ postfixadmin_db_pass }}
+hosts = 127.0.0.1
+dbname = postfixadmin
+table = alias
+select_field = goto
+where_field = address
+additional_conditions = and active = '1'
+

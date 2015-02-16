@@ -1,0 +1,109 @@
+- name: FAIL | Check domain
+  fail: msg='mta_domain is not defined'
+  when: not mta_domain
+
+- name: APT | Install Dovecot and postfix
+  apt: pkg={{ item }} state=latest update_cache=yes cache_valid_time=3600
+  with_items:
+    - dovecot-imapd
+    - dovecot-mysql
+    - php-xml-parser
+    - postfix-mysql
+    - pwgen
+
+- name: POSTFIXADMIN | download deb
+  get_url: url=http://downloads.sourceforge.net/project/postfixadmin/postfixadmin/postfixadmin-2.92/postfixadmin_2.92-1_all.deb dest=/root/postfixadmin_2.92-1_all.deb
+
+- name: POSTFIXADMIN | install deb
+  apt: deb=/root/postfixadmin_2.92-1_all.deb state=present
+
+- name: POSTFIXADMIN | apache config
+  file: src=/etc/postfixadmin/apache.conf dest=/etc/apache2/conf.d/postfixadmin.conf state=link
+  register: postfixadmin_apache
+  notify: apache-restart
+
+- name: POSTFIXADMIN | fetch db password
+  command: php -r 'require ("/etc/postfixadmin/dbconfig.inc.php"); echo $dbpass;'
+  register: postfixadmin_db_pass_out
+  failed_when: postfixadmin_db_pass_out.rc > 0 or postfixadmin_db_pass_out.stdout == ''
+  changed_when: False
+
+- name: POSTFIXADMIN | set fact db password
+  set_fact: postfixadmin_db_pass={{ postfixadmin_db_pass_out.stdout }}
+
+- name: POSTFIXADMIN | config
+  template: src=postfixadmin.config.local.php dest=/etc/postfixadmin/config.local.php
+
+- name: POSTFIXADMIN | upgrade (or install)
+  command: php /usr/share/postfixadmin/upgrade.php
+  register: postfixadmin_upgrade
+  changed_when: not "Database is up to date" in postfixadmin_upgrade.stdout
+
+- name: POSTFIXADMIN | check if domain is configured
+  command: mysql -ABN -e "SELECT 'True' FROM domain WHERE domain LIKE '{{ mta_domain }}'" postfixadmin
+  register: mta_domain_present
+  changed_when: mta_domain_present.stdout != "True"
+
+- name: POSTFIXADMIN | Add mta domain
+  command: mysql -ABN -e "INSERT IGNORE INTO domain VALUES ('ALL','', 0,0,0,0,'',0,NOW(),NOW(),1),('{{ mta_domain }}', '', 0, 0, 0, 0, 'virtual', 0, NOW(), NOW(), 1)" postfixadmin
+  when: mta_domain_present.stdout != "True"
+
+- name: FIREWALL | allow imap
+  lineinfile: dest=/etc/ferm/input/mda.conf create=yes line="proto tcp dport (imap smtp) ACCEPT;"
+  notify: firewall-restart
+
+- name: POSTFIX | mysql config
+  template: src=postfix/{{ item }} dest=/etc/postfix/
+  with_items:
+  - mysql_virtual_alias_domainaliases_maps.cf
+  - mysql_virtual_alias_maps.cf
+  - mysql_virtual_domains_maps.cf
+  - mysql_virtual_mailbox_domainaliases_maps.cf
+  - mysql_virtual_mailbox_maps.cf
+  notify: reload postfix
+
+- name: POSTFIX | patch main.cf
+  lineinfile: dest=/etc/postfix/main.cf line="{{ item }}"
+  with_items:
+  - "smtpd_sasl_type = dovecot"
+  - "smtpd_sasl_path = private/auth"
+  - "smtpd_sasl_auth_enable = yes"
+  - "broken_sasl_auth_clients = yes"
+  - "smtpd_sasl_security_options = noanonymous"
+  - "smtpd_sasl_local_domain ="
+  - "smtpd_sasl_authenticated_header = yes"
+  - "smtpd_helo_restrictions = permit_mynetworks, warn_if_reject reject_non_fqdn_hostname, reject_invalid_hostname, permit"
+  - "smtpd_sender_restrictions = permit_sasl_authenticated, permit_mynetworks, warn_if_reject reject_non_fqdn_sender, reject_unknown_sender_domain, reject_unauth_pipelining, permit"
+  - "smtpd_recipient_restrictions = reject_unauth_pipelining, permit_mynetworks, permit_sasl_authenticated, reject_non_fqdn_recipient, reject_unknown_recipient_domain, reject_unauth_destination, permit"
+  - "smtpd_data_restrictions = reject_unauth_pipelining"
+  - "virtual_mailbox_base = /var/vmail"
+  - "virtual_mailbox_maps = mysql:/etc/postfix/mysql_virtual_mailbox_maps.cf, mysql:/etc/postfix/mysql_virtual_mailbox_domainaliases_maps.cf"
+  - "virtual_alias_maps = mysql:/etc/postfix/mysql_virtual_alias_maps.cf, mysql:/etc/postfix/mysql_virtual_alias_domainaliases_maps.cf"
+  - "virtual_mailbox_domains = mysql:/etc/postfix/mysql_virtual_domains_maps.cf"
+  - "virtual_transport = dovecot"
+  notify: reload postfix
+
+
+- name: POSTFIX | patch master.cf
+  lineinfile: dest=/etc/postfix/master.cf line="dovecot      unix   -        n      n       -       -   pipe        flags=DRhu user=vmail:mail argv=/usr/lib/dovecot/dovecot-lda -d $(recipient)"
+  notify: reload postfix
+
+- name: DOVECOT | user vmail
+  user: name=vmail group=mail system=yes home=/var/vmail 
+
+- name: DOVECOT | config files
+  template: src=dovecot/{{ item }} dest=/etc/dovecot/conf.d/
+  with_items:
+  - 10-auth.conf
+  - 10-logging.conf
+  - 10-mail.conf
+  - 10-master.conf
+  - auth-sql.conf
+  notify: dovecot-restart
+
+- name: DOVECOT | DB config files
+  template: src=dovecot/{{ item }} dest=/etc/dovecot/
+  with_items:
+  - dovecot-sql.conf
+  notify: dovecot-restart
+

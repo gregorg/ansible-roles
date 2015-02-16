@@ -1,0 +1,6 @@
+dependencies:
+- apache
+- php
+- firewall
+- mta
+
