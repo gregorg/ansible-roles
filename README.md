@@ -20,7 +20,9 @@ How to use them
 - add the directory cloned to roles\_path in your ansible.cfg
 
 
-Notes
------
+Contributors
+------------
 
-Role 'mta' was forked from [HanXHX](https://github.com/HanXHX/my-ansible-playbooks/)'s playbooks.
+Feel free to contribute, pull requests are welcome.
+
+- Role 'mta' was forked from [HanXHX](https://github.com/HanXHX/my-ansible-playbooks/)'s playbooks.
