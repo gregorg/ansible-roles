@@ -1,3 +1,6 @@
 - name: dovecot-restart
   service: name=dovecot state=restarted
 
+- name: restart saslauth
+  service: name=saslauthd state=restarted
+

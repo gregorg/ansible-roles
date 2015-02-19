@@ -10,6 +10,9 @@
     - php-xml-parser
     - postfix-mysql
     - pwgen
+    - libsasl2-2
+    - libsasl2-modules
+    - sasl2-bin
 
 - name: POSTFIXADMIN | download deb
   get_url: url=http://downloads.sourceforge.net/project/postfixadmin/postfixadmin/postfixadmin-2.92/postfixadmin_2.92-1_all.deb dest=/root/postfixadmin_2.92-1_all.deb
@@ -49,7 +52,7 @@
   when: mta_domain_present.stdout != "True"
 
 - name: FIREWALL | allow imap
-  lineinfile: dest=/etc/ferm/input/mda.conf create=yes line="proto tcp dport (imap smtp) ACCEPT;"
+  lineinfile: dest=/etc/ferm/input/mda.conf create=yes line="proto tcp dport (imap smtp submission) ACCEPT;"
   notify: firewall-restart
 
 - name: POSTFIX | mysql config
@@ -88,6 +91,23 @@
   lineinfile: dest=/etc/postfix/master.cf line="dovecot      unix   -        n      n       -       -   pipe        flags=DRhu user=vmail:mail argv=/usr/lib/dovecot/dovecot-lda -d $(recipient)"
   notify: reload postfix
 
+- name: POSTFIX | create saslauthd chrooted folder
+  file: path=/var/spool/postfix/var/run/saslauthd state=directory owner=root group=sasl
+  notify: restart saslauth
+
+- name: POSTFIX | enable saslauthd
+  replace: dest=/etc/default/saslauthd regexp='{{ item.regexp }}' replace='{{ item.replace }}'
+  with_items:
+  - { regexp: '^START=no', replace: 'START=yes' }
+  - { regexp: '^OPTIONS="-c -m /var/run/saslauthd"', replace: 'OPTIONS="-c -m /var/spool/postfix/var/run/saslauthd"' }
+  notify:
+  - restart saslauth
+  - reload postfix
+
+- name: POSTFIX | sasl
+  lineinfile: 'dest=/etc/postfix/sasl/smtpd.conf line="pwcheck_method: saslauthd" create=yes'
+  notify: reload postfix
+
 - name: DOVECOT | user vmail
   user: name=vmail group=mail system=yes home=/var/vmail 
 
@@ -106,4 +126,5 @@
   with_items:
   - dovecot-sql.conf
   notify: dovecot-restart
+
 
