@@ -40,7 +40,7 @@
   - { regexp: "^myhostname =", line: "myhostname = {{ ansible_fqdn }}" }
   - { regexp: "^alias_maps =", line: "alias_maps = hash:/etc/aliases" }
   - { regexp: "^alias_database =", line: "alias_database = hash:/etc/aliases" }
-  - { regexp: "^mynetworks =", line: "mynetworks = 127.0.0.0/8{% if postfix_mynetworks %}, {{ postfix_mynetworks|join(', ') }}{% endif %}" }
+  - { regexp: "^mynetworks =", line: "mynetworks = 127.0.0.0/8, localhost{% if postfix_mynetworks %}, {{ postfix_mynetworks|join(', ') }}{% endif %}" }
     # DKIM
   - { regexp: "^milter_default_action =", line: "milter_default_action = accept" }
   - { regexp: "^milter_protocol =", line: "milter_protocol = 6" }
