@@ -83,7 +83,6 @@
   when: mta_virtual
   notify: reload postfix
 
-# TODO: submission port
 - name: POSTFIX | configure master.cf
   lineinfile: dest=/etc/postfix/master.cf line="    -o fallback_relay=" insertafter="^relay" backup=yes
   notify: reload postfix
