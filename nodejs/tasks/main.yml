@@ -11,13 +11,9 @@
   apt: pkg={{ item }} state=latest # use latest to upgrade nodejs from Debian if already installed
   with_items:
   - nodejs
-  #notify: [apt-clean,nginx-restart]
-
-- name: NODE | app folder
-  file: path=/var/local/app state=directory
 
 - name: NODE | install forever
-  npm: name=forever path=/var/local/app global=yes production=yes
+  npm: name=forever global=yes production=yes
 
 - name: Firewall rules
   copy: src=ferm_input.conf dest=/etc/ferm/input/apache.conf
