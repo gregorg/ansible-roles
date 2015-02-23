@@ -1,0 +1,24 @@
+- name: APT | Enable https
+  apt: pkg=apt-transport-https state=present
+
+- name: NODESOURCE | apt key
+  apt_key: url=https://deb.nodesource.com/gpgkey/nodesource.gpg.key state=present
+
+- name: NODESOURCE | apt sources
+  apt_repository: repo="deb https://deb.nodesource.com/node/ {{ ansible_lsb.codename }} main" state=present update_cache=yes
+
+- name: APT | Install packages
+  apt: pkg={{ item }} state=latest # use latest to upgrade nodejs from Debian if already installed
+  with_items:
+  - nodejs
+  #notify: [apt-clean,nginx-restart]
+
+- name: NODE | app folder
+  file: path=/var/local/app state=directory
+
+- name: NODE | install forever
+  npm: name=forever path=/var/local/app global=yes production=yes
+
+- name: Firewall rules
+  copy: src=ferm_input.conf dest=/etc/ferm/input/apache.conf
+  notify: firewall-restart
