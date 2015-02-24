@@ -11,10 +11,11 @@
   apt: pkg={{ item }} state=latest # use latest to upgrade nodejs from Debian if already installed
   with_items:
   - nodejs
+  - build-essential
 
 - name: NODE | install forever
   npm: name=forever global=yes production=yes
 
 - name: Firewall rules
-  copy: src=ferm_input.conf dest=/etc/ferm/input/apache.conf
+  copy: src=ferm_input.conf dest=/etc/ferm/input/node.conf
   notify: firewall-restart
