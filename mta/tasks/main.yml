@@ -35,7 +35,7 @@
   with_items:
   - { regexp: "^myorigin", line: "myorigin = /etc/mailname" }
   - { regexp: "^inet_interfaces", line: "inet_interfaces = {{ inet_interfaces }}" }
-  - { regexp: "^virtual_maps =", line: "virtual_maps = hash:/etc/aliases" }
+  #- { regexp: "^virtual_maps =", line: "virtual_maps = hash:/etc/aliases" }
   - { regexp: "^append_dot_mydomain =", line: "append_dot_mydomain = no" }
   - { regexp: "^myhostname =", line: "myhostname = {{ ansible_fqdn }}" }
   - { regexp: "^alias_maps =", line: "alias_maps = hash:/etc/aliases" }
@@ -48,8 +48,8 @@
   - { regexp: "^non_smtpd_milters =", line: "non_smtpd_milters = {{ postfix_smtpd_milters }}" }
     # tuning from http://postfix.traduc.org/index.php/TUNING_README.html" }
   - { regexp: "^smtpd_error_sleep_time =", line: "smtpd_error_sleep_time = 0" }
-  - { regexp: "^smtp_connect_timeout =", line: "smtp_connect_timeout = 10s" } # default 30s
-  - { regexp: "^smtp_helo_timeout =", line: "smtp_helo_timeout = 10s" } # default 30s
+  - { regexp: "^smtp_connect_timeout =", line: "smtp_connect_timeout = 20s" } # default 30s
+  - { regexp: "^smtp_helo_timeout =", line: "smtp_helo_timeout = 20s" } # default 30s
   - { regexp: "^queue_run_delay =", line: "queue_run_delay = 300s" } # default 1000s
   - { regexp: "^minimal_backoff_time =", line: "minimal_backoff_time = 300s" } # default 1000s
   - { regexp: "^maximal_backoff_time =", line: "maximal_backoff_time = 3000s" } # default 4000s
