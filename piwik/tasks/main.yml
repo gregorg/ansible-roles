@@ -1,0 +1,9 @@
+- name: PIWIK | download
+  get_url: url=http://builds.piwik.org/piwik.zip dest=/root/piwik.zip
+ 
+- name: PIWIK | unarchive
+  unarchive: src=/root/piwik.zip dest=/var/www owner=www-data group=www-data creates=/var/www/piwik/config/global.php copy=no
+
+- name: fix permissions
+  file: path=/var/www/piwik owner=www-data group=www-data recurse=yes state=directory
+
