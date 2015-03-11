@@ -1,0 +1,16 @@
+- name: APT | install packages
+  apt: pkg={{ item }} state=latest
+  with_items:
+  - rsync
+  - curlftpfs
+
+- name: FOLDERS | create mount point
+  file: path={{ backup }} state=directory
+
+- name: FSTAB | config
+  lineinfile: dest=/etc/fstab
+    line="curlftpfs#{{ ftpuser }}:{{ ftppasswd }}@{{ ftphost }} {{ backup }} fuse rw,allow_other,uid=nobody 0 0"
+
+- name: UPLOAD | backup script
+  template: src=dedibox_backup.sh dest=/etc/cron.daily/ mode=u+rx
+

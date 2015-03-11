@@ -1,0 +1,5 @@
+data: /home
+backup: /ftpbackup
+ftpuser:
+ftppasswd:
+ftphost:
