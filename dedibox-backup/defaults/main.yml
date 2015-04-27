@@ -1,5 +1,4 @@
-data: /home
-backup: /ftpbackup
+data: "/etc /home"
 ftpuser:
 ftppasswd:
 ftphost:
