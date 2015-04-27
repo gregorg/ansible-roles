@@ -1,0 +1,14 @@
+- name: APT | install cron-apt
+  apt: pkg=cron-apt state=latest
+
+- name: CRON-APT | config
+  template: src=cron-apt.config dest=/etc/cron-apt/config.d/notify
+
+- name: APT | security repositories
+  shell: grep -F security /etc/apt/sources.list /etc/apt/sources.list.d/* >/etc/apt/security.list  creates=/etc/apt/security.list
+
+- name: CRON-APT | actions
+  template: src=cron-apt.{{ item }} dest=/etc/cron-apt/action.d/5-{{ item }}
+  with_items:
+  - upgrade
+
