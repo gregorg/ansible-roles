@@ -2,3 +2,4 @@ data: "/etc /home"
 ftpuser:
 ftppasswd:
 ftphost:
+dedibox_backup_mysql: True
