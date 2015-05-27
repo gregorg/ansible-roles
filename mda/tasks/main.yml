@@ -84,6 +84,7 @@
   - "virtual_alias_maps = mysql:/etc/postfix/mysql_virtual_alias_maps.cf, mysql:/etc/postfix/mysql_virtual_alias_domainaliases_maps.cf"
   - "virtual_mailbox_domains = mysql:/etc/postfix/mysql_virtual_domains_maps.cf"
   - "virtual_transport = dovecot"
+  - "dovecot_destination_recipient_limit = 1"
   notify: reload postfix
 
 
