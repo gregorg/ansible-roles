@@ -13,6 +13,8 @@ smtpd_tls_key_file=/etc/ssl/private/ssl-cert-snakeoil.key
 smtpd_use_tls=yes
 smtpd_tls_session_cache_database = btree:${queue_directory}/smtpd_scache
 smtp_tls_session_cache_database = btree:${queue_directory}/smtp_scache
+# Fix TLS problems with Gmail and Hotmail:
+smtpd_tls_exclude_ciphers = RC4-MD5
 
 myhostname = {{ ansible_hostname }}.{{ ansible_domain }}
 alias_maps = hash:/etc/aliases

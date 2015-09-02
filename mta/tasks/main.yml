@@ -64,6 +64,7 @@
   - { regexp: "^smtpd_tls_cert_file ?=", line: "smtpd_tls_cert_file = /etc/dovecot/dovecot.pem" }
   - { regexp: "^smtpd_tls_key_file ?=", line: "smtpd_tls_key_file = /etc/dovecot/private/dovecot.pem" }
   - { regexp: "^smtpd_use_tls ?=", line: "smtpd_use_tls = yes" }
+  - { regexp: "^smtpd_tls_exclude_ciphers ?=", line: "smtpd_tls_exclude_ciphers = RC4-MD5" }
   - { regexp: "^smtpd_tls_session_cache_database =", line: "smtpd_tls_session_cache_database = btree:${queue_directory}/smtpd_scache" }
   - { regexp: "^smtp_tls_session_cache_database =", line: "smtp_tls_session_cache_database = btree:${queue_directory}/smtp_scache" }
   notify: reload postfix
