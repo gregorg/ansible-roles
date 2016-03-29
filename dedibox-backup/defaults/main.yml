@@ -3,3 +3,4 @@ ftpuser:
 ftppasswd:
 ftphost:
 dedibox_backup_mysql: True
+dedibox_backup_pg: False
