@@ -9,3 +9,15 @@
 
 - name: BACKUP | config
   template: src=backup-manager.conf dest=/etc/backup-manager.conf
+
+- name: BACKUP | archives folder
+  file: path={{ archives_root }} state=directory
+
+
+
+- name: create PG user root for backup
+  postgresql_user: name={{bm_pgsql_user}} role_attr_flags=SUPERUSER password={{ bm_pgsql_passwd }}
+  become: yes
+  become_user: postgres
+  when: dedibox_backup_pg
+

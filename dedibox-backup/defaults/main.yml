@@ -1,6 +1,10 @@
 data: "/etc /home"
+archives_root: "/var/archives" # debian's default
 ftpuser:
 ftppasswd:
 ftphost:
-dedibox_backup_mysql: True
+archives_ttl: "5"
+dedibox_backup_mysql: False
 dedibox_backup_pg: False
+bm_pgsql_user: backup
+bm_pgsql_passwd: 
