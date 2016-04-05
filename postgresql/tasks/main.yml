@@ -1,0 +1,155 @@
+- include: pgrepo.yml
+  when: pg_version > 9.4
+ 
+- name: "Install PostgreSQL {{ pg_version }}"
+  apt: pkg={{ item }} state=latest force=yes
+  with_items:
+  - "postgresql-{{ pg_version }}"
+  - "postgresql-client-{{ pg_version }}"
+  - "postgresql-server-dev-{{ pg_version }}"
+  - python-psycopg2
+  - ptop
+  - postgresql-contrib
+  - libpython-dev # for newrelic plugin
+  notify: apt-clean
+
+- name: Check that PostgreSQL data folder exists
+  file: path={{ pgdatadir }} state=directory owner=postgres
+
+- name: Check that PostgreSQL data were moved to /var/local
+  stat: path={{ pgdatadir }}
+  register: pgdata
+  when: pgdatadir != default_pg_datadir
+
+- name: Stop PostgreSQL
+  service: name=postgresql state=stopped
+  when: pgdata is defined and pgdata.stat.exists == false
+
+- name: Move PostgreSQL data dir
+  command: mv {{ default_pg_datadir }} {{ pgdatadir }}
+  when: pgdata is defined and pgdata.stat.exists == false and pgdatadir != default_pg_datadir
+
+- name: Let default PostgreSQL data dir for postgres user
+  file: path={{ default_pg_datadir }} state=directory owner=postgres
+
+- name: "Patch config (data to {{ pgdatadir }})"
+  replace: dest=/etc/postgresql/{{ pg_version }}/main/postgresql.conf regexp='{{ default_pg_datadir }}/{{ pg_version }}/main' replace='{{ pgdatadir }}/{{ pg_version }}/main'
+  when: pgdata is defined and pgdata.stat.exists == false and pgdatadir != default_pg_datadir
+
+- name: Allow localhost user 
+  lineinfile: dest=/etc/postgresql/{{ pg_version }}/main/pg_hba.conf line="{{ item }}"
+  with_items:
+  - "host     all     postgres        127.0.0.1/32        trust"
+  - "local    all     root                                peer"
+  - "local    replication     postgres                     peer"
+  - "host     template1     {{ pg_monitor_user }}         {{ pg_monitor_network }}        trust"
+  notify: pg_reload
+
+- name: PosgreSQL config
+  lineinfile: >
+   dest=/etc/postgresql/{{ pg_version }}/main/postgresql.conf 
+   line="include_dir = 'conf.d'"
+  notify: pg_restart
+
+- name: PosgreSQL conf.d folder
+  file: path=/etc/postgresql/{{ pg_version }}/main/conf.d state=directory owner=postgres group=postgres
+
+- name: Backup folder
+  file: path={{ pg_backup_dir }}/main/conf.d state=directory owner=postgres group=postgres
+
+- name: PostgreSQL base config
+  template: src=base.conf dest=/etc/postgresql/{{ pg_version }}/main/conf.d/
+  notify: pg_restart
+
+- name: PostgreSQL tuning config
+  template: src=memory.conf dest=/etc/postgresql/{{ pg_version }}/main/conf.d/
+  notify: pg_restart
+
+- name: PostgreSQL PRODUCTION config
+  template: src={{ item }}.conf dest=/etc/postgresql/{{ pg_version }}/main/conf.d/
+  with_items:
+  - fast_raid
+  when: pg_prod
+  notify: pg_restart
+
+# In 9.3, PostgreSQL has switched from using SysV shared memory to using Posix shared memory and mmap for memory management. This allows easier installation and configuration of PostgreSQL, and means that except in usual cases, system parameters such as SHMMAX and SHMALL no longer need to be adjusted.
+- name: PG | sysctl tuning
+  sysctl: name="{{ item.key }}" value="{{ item.value }}" reload=yes
+  with_items:
+  #- { key: 'kernel.shmmax', value: '' }
+  #- { key: 'kernel.shmall', value: '' } 
+  - { key: 'vm.nr_hugepages', value: "{{ '%d' | format(2048000 / 4096 | int) }}" }
+
+- name: Start PostgreSQL
+  service: name=postgresql state=started
+  when: pgdata is defined and pgdata.stat.exists == false
+
+  # impossible de créer un user en read-only
+- name: Create root user
+  postgresql_user: name=root role_attr_flags=SUPERUSER,REPLICATION
+  become: yes
+  become_user: postgres
+  register: pg_root_user_return
+  failed_when: pg_root_user_return.failed is defined and "read-only transaction" not in pg_root_user_return.msg
+
+- name: Check if PG is read-only
+  command: /usr/bin/psql template1 -c "SELECT pg_is_in_recovery()" -n -t
+  register: pg_is_in_recovery
+  changed_when: False
+
+- name: Set read-only fact
+  set_fact: pg_read_only=True
+  when: pg_is_in_recovery.stdout == " t"
+
+- name: Create monitor user
+  postgresql_user: name={{ pg_monitor_user }} role_attr_flags=LOGIN,SUPERUSER
+  become: yes
+  become_user: postgres
+  when: not pg_read_only
+
+- name: psqlrc
+  copy: src=psqlrc dest={{ item }}/.psqlrc owner=postgres group=postgres
+  with_items:
+  - ~postgres
+  - /root
+
+- name: backup script
+  template: src=pg_backup.sh dest=/usr/local/bin/pg_backup.sh owner=postgres mode=a+x
+
+- name: cron backup
+  template: src=cron.backup dest=/etc/cron.d/pg-backup
+
+- name: PGTOOLS | pgloader | git
+  git: repo=https://github.com/dimitri/pgloader.git version=master dest=/usr/local/pgloader depth=1
+  register: pgloader_git
+
+- name: PGTOOLS | pgloader | deps
+  apt: pkg={{ item }} state=present
+  with_items:
+  - sbcl
+  - patch
+  - unzip
+  - devscripts
+  - freetds-dev
+
+- name: PGTOOLS | pgloader | make
+  shell: chdir=/usr/local/pgloader make pgloader
+  when: pgloader_git.changed
+
+- name: PGTOOLS | pgloader | symlink to /usr/local/bin
+  file: src=/usr/local/pgloader/build/bin/pgloader dest=/usr/local/bin/pgloader state=link
+
+- name: newrelic plugin agent
+  pip: name={{ item }} state=latest
+  with_items:
+  - newrelic-plugin-agent
+  - "newrelic-plugin-agent[postgresql]"
+  notify: restart newrelic plugin agent
+
+- name: newrelic plugin agent config
+  template: src=newrelic-plugin-agent.cfg dest=/etc/newrelic/newrelic-plugin-agent.cfg
+  notify: restart newrelic plugin agent
+
+- name: newrelic plugin agent upstart
+  copy: src=newrelic_plugin_agent.service dest=/lib/systemd/system/newrelic_plugin_agent.service
+  notify: restart newrelic plugin agent

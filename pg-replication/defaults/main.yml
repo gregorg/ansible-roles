@@ -1,0 +1,6 @@
+repmgr_user: repmgr
+repmgr_db: repmgr
+repmgr_network: 192.168.0.0/24
+pg_archive_path: /var/local/pg-archive
+pg_keep_archives_days: 2
+pg_archive_max_space_gb: 64

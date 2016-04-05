@@ -1,0 +1,18 @@
+# WARNING: do not modify this one unless Debian change its policy:
+default_pg_datadir: /var/lib/postgresql
+
+
+# Our configuration:
+pgdatadir: /var/local/postgresql
+pg_backup_dir: /var/local/pg-backup
+pg_version: 9.4
+
+# must be defined in group_vars:
+#pg_monitor_network: 10.0.0.0/24
+#pg_monitor_user: monitor
+#pg_monitor_db: monitor
+
+# config
+pg_max_connections: 100
+pg_default_statistics_target: 100
+pg_prod: True

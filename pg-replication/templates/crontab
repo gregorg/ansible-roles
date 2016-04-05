@@ -1,0 +1,1 @@
+*/5	*	* * *	postgres	/usr/local/sbin/pg_purge_archives {{ pg_archive_path }} {{ pg_archive_max_space_gb }} {{ pg_keep_archives_days }}

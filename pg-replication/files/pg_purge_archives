@@ -1,0 +1,64 @@
+#!/bin/bash
+# Purge and compress WAL archives
+
+ARCHIVE_PATH="$1"
+# in GB
+MAXDISKSPACE=$2
+MAXDAYS=$3
+LOG=/var/log/postgresql/purge-archives.log
+COMPRESS=/usr/bin/pigz
+compressed=0
+lockfile=/tmp/pg_purge_archives.lock
+
+# To GB
+MAXDISKSPACE=$(( $MAXDISKSPACE * 1024 * 1024 ))
+
+if [ -e $lockfile ]
+then
+	echo "$( date -R ) :: already running (cron duplicate)" >>$LOG
+	exit 1
+fi
+touch $lockfile
+
+
+function rm_lock()
+{
+	test -e $lockfile && rm $lockfile
+}
+trap rm_lock EXIT
+
+echo "$( date -R ) :: start a purge ..." >>$LOG
+find $ARCHIVE_PATH -type f -mtime +$MAXDAYS -print -delete >>$LOG
+
+echo "$( date -R ) :: compress files ..." >>$LOG
+if [ ! -x $COMPRESS ]
+then
+	# fallback to gzip
+	COMPRESS=/usr/bin/gzip
+fi
+for f in $ARCHIVE_PATH/*
+do
+    if [ "$f" = "${f%.gz}" ]
+    then
+        if [ -e "$f" ]
+        then
+            #echo "Compressing $f"
+            $COMPRESS -6 "$f" >>$LOG
+			compressed=$(( $compressed + 1 ))
+        fi
+    fi
+done
+
+echo "$( date -R ) :: $compressed compressed files ..." >>$LOG
+
+
+removed=0
+while [ $( du -s $ARCHIVE_PATH/ | awk '{print $1}' ) -gt $MAXDISKSPACE ]
+do
+	older=$( ls -trh1 $ARCHIVE_PATH | head -1 )
+	rm -v $ARCHIVE_PATH/$older >>$LOG
+	removed=$(( $removed + 1 ))
+done
+echo "$( date -R ) :: $removed removed files ..." >>$LOG
+
+rm $lockfile

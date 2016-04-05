@@ -1,0 +1,21 @@
+# Generated as :
+
+$ ssh-keygen -f pg-replication/files/ssh_repmgr -N "" -C postgres
+Generating public/private rsa key pair.
+Your identification has been saved in extern/ansible-roles/pg-replication/files/ssh_repmgr.
+Your public key has been saved in extern/ansible-roles/pg-replication/files/ssh_repmgr.pub.
+The key fingerprint is:
+c3:21:a3:1e:59:98:d4:46:bd:28:e7:24:a7:bd:b9:0c gregory@epoc-01
+The key's randomart image is:
++--[ RSA 2048]----+
+|    .o..         |
+|   . oo .        |
+|    o.+...       |
+|    o+=+..       |
+|    +X  S        |
+|   ...o  .       |
+|    E  o         |
+|     oo          |
+|      o.         |
++-----------------+
+

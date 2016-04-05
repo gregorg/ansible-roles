@@ -1,0 +1,11 @@
+[Unit]
+Description=Meetme New Relic plugin agent
+After=network.target auditd.service
+
+[Service]
+ExecStart=/usr/local/bin/newrelic-plugin-agent -f -c /etc/newrelic/newrelic-plugin-agent.cfg
+KillMode=process
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

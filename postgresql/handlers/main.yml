@@ -1,0 +1,9 @@
+- name: pg_reload
+  service: name=postgresql state=reloaded
+
+- name: pg_restart
+  service: name=postgresql state=restarted
+
+- name: restart newrelic plugin agent
+  service: name=newrelic_plugin_agent state=restarted
+

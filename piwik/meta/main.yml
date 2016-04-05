@@ -1,2 +1,6 @@
 dependencies:
 - mysql
+- { role: add_mysql_db, database: "piwik", 
+    user: "piwik", password: "chohqu1chuechish", priv: "piwik.*:ALL",
+    #dump: annonces.sql.gz, db_reset: False
+    }

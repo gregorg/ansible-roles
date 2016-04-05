@@ -19,6 +19,7 @@ How to use them
 - clone this repo
 - add the directory cloned to roles\_path in your ansible.cfg
 
+TODO: http://linuxfr.org/news/un-peu-plus-de-securite-sous-linux
 
 Contributors
 ------------

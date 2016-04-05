@@ -1,0 +1,9 @@
+- name: Add PostgreSQL debian repository key
+  apt_key: url=https://www.postgresql.org/media/keys/ACCC4CF8.asc state=present
+
+- name: Add PostgreSQL debian repository
+  apt_repository: repo='deb http://apt.postgresql.org/pub/repos/apt/ {{ ansible_lsb.codename }}-pgdg main' state=present update_cache=yes
+
+- name: apt-get update
+  apt: update_cache=yes cache_valid_time=3600
+
