@@ -16,3 +16,4 @@ pg_version: 9.4
 pg_max_connections: 100
 pg_default_statistics_target: 100
 pg_prod: True
+with_pgloader: False

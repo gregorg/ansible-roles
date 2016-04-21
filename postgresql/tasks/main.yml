@@ -119,37 +119,9 @@
 - name: cron backup
   template: src=cron.backup dest=/etc/cron.d/pg-backup
 
-- name: PGTOOLS | pgloader | git
-  git: repo=https://github.com/dimitri/pgloader.git version=master dest=/usr/local/pgloader depth=1
-  register: pgloader_git
+- include: pgloader.yml
+  when: with_pgloader
 
-- name: PGTOOLS | pgloader | deps
-  apt: pkg={{ item }} state=present
-  with_items:
-  - sbcl
-  - patch
-  - unzip
-  - devscripts
-  - freetds-dev
+- include: newrelic.yml
+  when: newrelic_license is defined
 
-- name: PGTOOLS | pgloader | make
-  shell: chdir=/usr/local/pgloader make pgloader
-  when: pgloader_git.changed
-
-- name: PGTOOLS | pgloader | symlink to /usr/local/bin
-  file: src=/usr/local/pgloader/build/bin/pgloader dest=/usr/local/bin/pgloader state=link
-
-- name: newrelic plugin agent
-  pip: name={{ item }} state=latest
-  with_items:
-  - newrelic-plugin-agent
-  - "newrelic-plugin-agent[postgresql]"
-  notify: restart newrelic plugin agent
-
-- name: newrelic plugin agent config
-  template: src=newrelic-plugin-agent.cfg dest=/etc/newrelic/newrelic-plugin-agent.cfg
-  notify: restart newrelic plugin agent
-
-- name: newrelic plugin agent upstart
-  copy: src=newrelic_plugin_agent.service dest=/lib/systemd/system/newrelic_plugin_agent.service
-  notify: restart newrelic plugin agent

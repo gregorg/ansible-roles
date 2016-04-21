@@ -1,0 +1,14 @@
+- name: newrelic plugin agent
+  pip: name={{ item }} state=latest
+  with_items:
+  - newrelic-plugin-agent
+  - "newrelic-plugin-agent[postgresql]"
+  notify: restart newrelic plugin agent
+
+- name: newrelic plugin agent config
+  template: src=newrelic-plugin-agent.cfg dest=/etc/newrelic/newrelic-plugin-agent.cfg
+  notify: restart newrelic plugin agent
+
+- name: newrelic plugin agent upstart
+  copy: src=newrelic_plugin_agent.service dest=/lib/systemd/system/newrelic_plugin_agent.service
+  notify: restart newrelic plugin agent

@@ -1,0 +1,20 @@
+- name: PGTOOLS | pgloader | git
+  git: repo=https://github.com/dimitri/pgloader.git version=master dest=/usr/local/pgloader depth=1
+  register: pgloader_git
+
+- name: PGTOOLS | pgloader | deps
+  apt: pkg={{ item }} state=present
+  with_items:
+  - sbcl
+  - patch
+  - unzip
+  - devscripts
+  - freetds-dev
+
+- name: PGTOOLS | pgloader | make
+  shell: chdir=/usr/local/pgloader make pgloader
+  when: pgloader_git.changed
+
+- name: PGTOOLS | pgloader | symlink to /usr/local/bin
+  file: src=/usr/local/pgloader/build/bin/pgloader dest=/usr/local/bin/pgloader state=link
+

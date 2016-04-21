@@ -84,4 +84,5 @@
 - name: purge logfile owner
   command: "chown postgres: /var/log/postgresql/purge-archives.log"
   changed_when: False
+  ignore_errors: True
 
