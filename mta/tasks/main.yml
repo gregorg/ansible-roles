@@ -88,6 +88,10 @@
   lineinfile: dest=/etc/postfix/master.cf line="    -o fallback_relay=" insertafter="^relay" backup=yes
   notify: reload postfix
 
+- include: mailjet.yml
+  when: mailjet_key is defined
+  
+
 - name: TEMPLATE | Deploy aliases 
   template: src=etc/aliases.j2 dest=/etc/aliases
   notify: newaliases

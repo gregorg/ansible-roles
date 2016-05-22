@@ -1,0 +1,16 @@
+- name: MAILJET | relayhost
+  lineinfile: dest=/etc/postfix/main.cf regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
+  with_items:
+  - { regexp: "^relayhost", line: "relayhost = {{mailjet_smtp}}" }
+  - { regexp: "^smtp_sasl_auth_enable", line: "smtp_sasl_auth_enable = yes" }
+  - { regexp: "^smtp_sasl_password_maps", line: "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd" }
+  notify: reload postfix
+
+- name: MAILJET | sasl 
+  lineinfile: dest=/etc/postfix/sasl_passwd regexp="^{{mailjet_smtp}}" line="{{ mailjet_smtp }} {{ mailjet_key }}:{{ mailjet_pass }}" owner=root group=root mode=600 create=yes
+  notify: reload postfix
+
+- name: MAILJET | reload sasl
+  command: /usr/sbin/postmap /etc/postfix/sasl_passwd
+  changed_when: False
+

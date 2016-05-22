@@ -23,3 +23,5 @@ opendkim_domain_keys_dir: '{{ opendkim_keys_dir }}/{{ mta_domain }}'
 opendkim_private_key: '{{ opendkim_domain_keys_dir }}/{{ opendkim_selector }}.private'
 opendkim_txt_record: '{{ opendkim_domain_keys_dir }}/{{ opendkim_selector }}.txt'
 postfix_smtpd_milters: "inet:{{ opendkim_listen }}:{{ opendkim_port }}"
+
+mailjet_smtp: in-v3.mailjet.com
