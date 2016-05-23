@@ -61,14 +61,31 @@
   - { regexp: "^bounce_notice_recipient =", line: "bounce_notice_recipient = bounce" }
   - { regexp: "^error_notice_recipient =", line: "error_notice_recipient = bounce" }
   - { regexp: "^disable_vrfy_command =", line: "disable_vrfy_command = yes" }
-  - { regexp: "^smtpd_tls_cert_file ?=", line: "smtpd_tls_cert_file = /etc/dovecot/dovecot.pem" }
-  - { regexp: "^smtpd_tls_key_file ?=", line: "smtpd_tls_key_file = /etc/dovecot/private/dovecot.pem" }
-  - { regexp: "^smtpd_use_tls ?=", line: "smtpd_use_tls = yes" }
   - { regexp: "^smtpd_tls_exclude_ciphers ?=", line: "smtpd_tls_exclude_ciphers = RC4-MD5" }
   - { regexp: "^smtpd_tls_session_cache_database =", line: "smtpd_tls_session_cache_database = btree:${queue_directory}/smtpd_scache" }
   - { regexp: "^smtp_tls_session_cache_database =", line: "smtp_tls_session_cache_database = btree:${queue_directory}/smtp_scache" }
   notify: reload postfix
   # Note: sometime postfix need to be fully restarted
+
+- name: POSTFIX | check dovecot presence
+  stat: path=/etc/dovecot/dovecot.pem
+  register: dovecot_pem_file
+
+- name: POSTFIX | configure main.cf
+  lineinfile: dest=/etc/postfix/main.cf regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
+  when: dovecot_pem_file.stat.exists
+  with_items:
+  - { regexp: "^smtpd_tls_cert_file ?=", line: "smtpd_tls_cert_file = /etc/dovecot/dovecot.pem" }
+  - { regexp: "^smtpd_tls_key_file ?=", line: "smtpd_tls_key_file = /etc/dovecot/private/dovecot.pem" }
+  - { regexp: "^smtpd_use_tls ?=", line: "smtpd_use_tls = yes" }
+  notify: reload postfix
+
+- name: POSTFIX | configure main.cf
+  lineinfile: dest=/etc/postfix/main.cf regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
+  when: not dovecot_pem_file.stat.exists
+  with_items:
+  - { regexp: "^smtpd_use_tls ?=", line: "smtpd_use_tls = no" }
+  notify: reload postfix
 
 - name: POSTFIX | configure as not virtual
   lineinfile: dest=/etc/postfix/main.cf regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
