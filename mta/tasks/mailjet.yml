@@ -4,6 +4,8 @@
   - { regexp: "^relayhost", line: "relayhost = {{mailjet_smtp}}" }
   - { regexp: "^smtp_sasl_auth_enable", line: "smtp_sasl_auth_enable = yes" }
   - { regexp: "^smtp_sasl_password_maps", line: "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd" }
+  - { regexp: "^smtp_sasl_security_options", line: "smtp_sasl_security_options = noanonymous" }
+  - { regexp: "^smtp_always_send_ehlo", line: "smtp_always_send_ehlo = yes" }
   notify: reload postfix
 
 - name: MAILJET | sasl 
@@ -13,4 +15,8 @@
 - name: MAILJET | reload sasl
   command: /usr/sbin/postmap /etc/postfix/sasl_passwd
   changed_when: False
+
+- name: MAILJET | sasl libs
+  apt: pkg=libsasl2-modules state=present
+  notify: reload postfix
 

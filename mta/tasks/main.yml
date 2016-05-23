@@ -33,7 +33,7 @@
 - name: POSTFIX | configure main.cf
   lineinfile: dest=/etc/postfix/main.cf regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
   with_items:
-  - { regexp: "^myorigin", line: "myorigin = /etc/mailname" }
+  - { regexp: "^myorigin", line: "myorigin = {{ mta_domain }}" }
   - { regexp: "^inet_interfaces", line: "inet_interfaces = {{ inet_interfaces }}" }
   #- { regexp: "^virtual_maps =", line: "virtual_maps = hash:/etc/aliases" }
   - { regexp: "^append_dot_mydomain =", line: "append_dot_mydomain = no" }
