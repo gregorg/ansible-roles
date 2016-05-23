@@ -1,0 +1,9 @@
+- name: FAILED | not configured
+  fail: msg="you need to configure opcache-status with variable opcache_status_dir"
+  when: opcache_status_dir is not defined
+
+- name: GIT | clone opcache-status
+  git: repo=https://github.com/rlerdorf/opcache-status.git dest={{opcache_status_dir}} accept_hostkey=yes depth=1
+  ignore_errors: True
+
+
