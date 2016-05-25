@@ -20,4 +20,5 @@
   become: yes
   become_user: postgres
   when: dedibox_backup_pg
+  ignore_errors: True
 
