@@ -25,3 +25,8 @@
  
 - name: ensure influxdb is started
   service: name=influxdb state=started
+
+- name: collectd influxdb config
+  template: src=influxdb.conf dest=/etc/collectd/collectd.conf.d/influxdb.conf
+  notify: restart-collectd
+
