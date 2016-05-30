@@ -1,0 +1,2 @@
+influxdb_version: 0.13.0~rc2
+influxdb_directory: /var/lib/influxdb
