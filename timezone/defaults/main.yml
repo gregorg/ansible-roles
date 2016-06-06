@@ -1,0 +1,4 @@
+---
+# defaults file for timezone
+timezone: Europe/Paris
+backup_etc_files: false
