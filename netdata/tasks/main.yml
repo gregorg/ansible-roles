@@ -1,0 +1,28 @@
+- name: APT | netdata dependencies
+  apt: pkg={{ item }} state=present
+  with_items:
+  - zlib1g-dev
+  - uuid-dev
+  - libmnl-dev
+  - gcc
+  - make
+  - git
+  - autoconf
+  - autogen
+  - automake
+  - pkg-config
+  - curl
+  - jq
+  - nodejs
+
+- name: GIT | clone netdata
+  git: repo=https://github.com/firehol/netdata.git dest=/var/tmp/netdata accept_hostkey=yes depth=1
+  register: git_clone_netdata
+
+- name: install netdata
+  shell: /var/tmp/netdata/netdata-installer.sh --dont-wait
+#  when: git_clone_netdata|changed
+
+- name: Firewall rules
+  copy: src=ferm_input.conf dest=/etc/ferm/input/netdata.conf
+  notify: firewall-restart
