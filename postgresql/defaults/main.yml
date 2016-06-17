@@ -6,6 +6,8 @@ default_pg_datadir: /var/lib/postgresql
 pgdatadir: /var/local/postgresql
 pg_backup_dir: /var/local/pg-backup
 pg_version: 9.4
+# Total mem / 4
+pg_shared_buffers: "{{ '%d' | format(ansible_memtotal_mb / 1000 / 4 | int) }}GB"
 
 # must be defined in group_vars:
 #pg_monitor_network: 10.0.0.0/24
