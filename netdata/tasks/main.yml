@@ -12,6 +12,11 @@
   - automake
   - pkg-config
   - curl
+
+- name: APT | netdata recommends
+  apt: pkg={{ item }} state=present
+  when: ansible_lsb.major_release|int >= 8
+  with_items:
   - jq
   - nodejs
 
@@ -20,9 +25,9 @@
   register: git_clone_netdata
 
 - name: install netdata
-  shell: /var/tmp/netdata/netdata-installer.sh --dont-wait
+  shell: /var/tmp/netdata/netdata-installer.sh --dont-wait chdir=/var/tmp/netdata/
 #  when: git_clone_netdata|changed
 
 - name: Firewall rules
-  copy: src=ferm_input.conf dest=/etc/ferm/input/netdata.conf
+  template: src=ferm_input.conf dest=/etc/ferm/input/netdata.conf
   notify: firewall-restart
