@@ -1,0 +1,29 @@
+- name: Install collectd packages
+  apt: pkg={{ item }} state=latest
+  with_items: packages
+  notify: restart-collectd
+
+- name: Install collectd packages (fix for squeeze)
+  apt: pkg={{ item }} state=latest default_release=squeeze-backports
+  with_items: packages
+  notify: restart-collectd
+  when: ansible_lsb.codename == "squeeze"
+
+- name: Check if I am the collectd server
+  set_fact: collectd_server_config='Listen "{{ monitor_server }}" "{{ collectd_port }}"' collectd_client_config='' collectd_is_server=true
+  when: ansible_hostname == monitor_server
+ 
+- name: SET | hostname_alias
+  set_fact: hostname_alias="{{ ansible_fqdn }}"
+  when: hostname_alias is not defined
+
+- name: Collectd config
+  template: src={{ item }} dest=/etc/collectd/
+  with_items:
+  - collectd.conf
+  notify: restart-collectd
+
+- include: server.yml
+  when: ansible_hostname == monitor_server
+
+

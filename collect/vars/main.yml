@@ -1,0 +1,10 @@
+collectd_server_config: ""
+collectd_client_config: 'Server "{{ monitor_server }}" "{{ collectd_port }}"'
+collectd_is_server: false
+
+packages:
+  - collectd-utils
+  - collectd-core
+  - collectd
+
+

@@ -1,0 +1,22 @@
+- name: SERVER | packages
+  apt: pkg={{ item }} state=latest
+  with_items:
+  - rrdcached
+
+- name: COLLECTD | auth file
+  template: src={{ item }} dest=/etc/collectd/
+  with_items:
+  - auth_file
+  notify: restart-collectd
+
+- name: SERVER | CGP web interface
+  git: repo=https://github.com/pommi/CGP.git dest={{collectd_docroot}}
+
+- name: FIREWALL | rules
+  template: src=ferm_collectd.conf dest=/etc/ferm/input/
+  notify: firewall-restart
+
+- name: CGP | config
+  template: src=cgp_config.php dest={{collectd_docroot}}/conf/config.local.php
+
+#  CONFIG['cat']['category1'] = array('host1', 'host2');

@@ -1,0 +1,7 @@
+#monitor_server: sd-28915
+monitor_server: sd-27987
+monitor_server_ip: sd-27987.dedibox.fr
+collectd_port: 25827
+collectd_user: hostcooker
+collectd_password: weiyuquaigheekoi
+collectd_docroot: /var/www/cgp
