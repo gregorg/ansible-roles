@@ -55,7 +55,7 @@
   file: path=/etc/postgresql/{{ pg_version }}/main/conf.d state=directory owner=postgres group=postgres
 
 - name: Backup folder
-  file: path={{ pg_backup_dir }}/main/conf.d state=directory owner=postgres group=postgres
+  file: path={{ pg_backup_dir }} state=directory owner=postgres group=postgres
 
 - name: PostgreSQL base config
   template: src=base.conf dest=/etc/postgresql/{{ pg_version }}/main/conf.d/
