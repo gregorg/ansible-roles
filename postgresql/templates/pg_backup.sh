@@ -43,6 +43,7 @@ do
 		vacuumdb -e -v -z --table "$table" "$db" &
 	done
 	wait # for vacuum to finish
+    pg_dump -Fc "$db" | lzma $COMPRESSLEVEL >"$PGBACKUPDIR/new/dump/$db.dump.lzma"
 done
 
 tar czf "$PGBACKUPDIR/new/datadir.tgz" "$PGBACKUPDIR/new/datadir" && rm -rf "$PGBACKUPDIR/new/datadir"
