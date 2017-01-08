@@ -4,7 +4,7 @@
   - ferm
   notify: firewall-restart
 
-- name: FERM | config
+- name: FERM | main config
   template: src={{ item }} dest=/etc/ferm/
   with_items:
   - ferm.conf
@@ -16,3 +16,8 @@
   - input
   notify: firewall-restart
 
+- name: FERM | configs
+  template: src={{ item }} dest=/etc/ferm/input/
+  with_items:
+  - blacklist.conf
+  notify: firewall-restart

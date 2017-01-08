@@ -1,1 +1,5 @@
 is_fw_ferm: True
+
+blacklisted_ips:
+- 191.96.249.80
+
