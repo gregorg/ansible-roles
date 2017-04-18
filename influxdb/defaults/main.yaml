@@ -1,2 +1,5 @@
-influxdb_version: 0.13.0~rc2
-influxdb_directory: /var/lib/influxdb
+influxdb_version: 1.1.1
+influxdb_directory: /var/local/influxdb
+influxdb_backup_dir: /var/local/backups/influxdb
+influxdb_port: 8086
+influxdb_udp_db: udp

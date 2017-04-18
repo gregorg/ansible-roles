@@ -7,12 +7,10 @@
   when: influxdb_download_deb|changed
   notify: restart influxdb
 
-#- name: collectd types.db
-#  synchronize:
-#    src: /usr/share/collectd/types.db
-#    dest: /etc/influxdb/collectd_types.db
-#  delegate_to: "{{collectd_main}}"
-#  when: collectd_main is defined
+- name: collectd types.db
+  shell: cat /usr/share/collectd/types.db /etc/collectd/my_types.db > /etc/influxdb/collectd_types.db
+  when: collectd_main is defined
+  changed_when: False
 
 - name: configuration
   template: src=influxdb.conf dest=/etc/influxdb/influxdb.conf
@@ -21,12 +19,13 @@
 - name: data directory
   file: path={{ influxdb_directory }} state=directory owner=influxdb group=influxdb
 
+- name: backup script
+  copy: src=influxdb_backup.sh dest=/usr/local/sbin/influxdb_backup.sh mode=755
+
+- name: crontab
+  template: src=crontab dest=/etc/cron.d/influxdb mode=644
+
 - meta: flush_handlers
  
 - name: ensure influxdb is started
   service: name=influxdb state=started
-
-- name: collectd influxdb config
-  template: src=influxdb.conf dest=/etc/collectd/collectd.conf.d/influxdb.conf
-  notify: restart-collectd
-

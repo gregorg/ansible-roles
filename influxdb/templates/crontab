@@ -1,0 +1,1 @@
+0 5		* * *		root	/usr/local/sbin/influxdb_backup.sh {{ ansible_eth0.ipv4.address }} {{ influxdb_backup_dir }}
