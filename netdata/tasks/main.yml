@@ -31,3 +31,9 @@
 - name: Firewall rules
   template: src=ferm_input.conf dest=/etc/ferm/input/netdata.conf
   notify: firewall-restart
+
+- name: disable mail notifications
+  lineinfile:
+      dest: /etc/netdata/health_alarm_notify.conf
+      regexp: '^SEND_EMAIL='
+      line: 'SEND_EMAIL="NO"'
