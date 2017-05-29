@@ -1,0 +1,1 @@
+grafana_root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
