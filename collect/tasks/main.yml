@@ -1,11 +1,11 @@
 - name: Install collectd packages
   apt: pkg={{ item }} state=latest
-  with_items: packages
+  with_items: "{{packages}}"
   notify: restart-collectd
 
 - name: Install collectd packages (fix for squeeze)
   apt: pkg={{ item }} state=latest default_release=squeeze-backports
-  with_items: packages
+  with_items: "{{packages}}"
   notify: restart-collectd
   when: ansible_lsb.codename == "squeeze"
 
