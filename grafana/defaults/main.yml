@@ -1,1 +1,7 @@
 grafana_root_url: "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+grafana_email: False
+grafana_email_host: localhost
+grafana_email_user: 
+grafana_email_password:
+grafana_email_from: grafana@localhost
+
