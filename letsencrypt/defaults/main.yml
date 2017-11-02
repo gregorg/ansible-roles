@@ -1,0 +1,3 @@
+letsencrypt_workdir: /etc/letsencrypt
+certbot_register_email: none@example.com
+renew_enabled: True

@@ -1,0 +1,7 @@
+- name: LETSENCRYPT | work directory
+  file: path={{letsencrypt_workdir}} state=directory
+
+- name: crontab
+  template: src=cron dest=/etc/cron.d/letsencrypt
+
+- include: certbot.yml

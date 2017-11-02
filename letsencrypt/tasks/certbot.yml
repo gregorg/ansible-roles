@@ -1,0 +1,21 @@
+# Attention: le lancement de certbot-auto provoque une mise à jour de lui-même
+# du coup, il écrase son binaire, et la commande git suivante va la supprimer.
+#
+- name: GIT | clone certbot
+  git: repo=https://github.com/certbot/certbot.git depth=1 dest=/usr/local/certbot force=yes
+  notify: install certbot
+#  changed_when: True
+
+- meta: flush_handlers
+
+- name: /etc/letsencrypt permissions
+  file: path=/etc/letsencrypt state=directory mode=755 recurse=no
+
+- name: /etc/letsencrypt subfolders permissions
+  file: path=/etc/letsencrypt/{{item}} state=directory mode=755 recurse=yes
+  with_items:
+  - archive
+  - live
+
+- name: /etc/letsencrypt/nginx subfolder permissions
+  file: path=/etc/letsencrypt/nginx state=directory mode=777 recurse=yes

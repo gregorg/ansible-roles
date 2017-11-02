@@ -1,0 +1,2 @@
+- name: install certbot
+  command: /usr/local/certbot/certbot-auto register --agree-tos -m skygreg@gmail.com --update-registration -n

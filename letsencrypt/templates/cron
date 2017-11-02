@@ -1,0 +1,8 @@
+SHELL=/bin/sh
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+MAILTO=skygreg@gmail.com
+
+
+{% if renew_enabled %}
+45 10    * * *   root    /usr/local/certbot/certbot-auto -n renew --allow-subset-of-names
+{% endif %}
