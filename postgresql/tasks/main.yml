@@ -23,18 +23,18 @@
 
 - name: Stop PostgreSQL
   service: name=postgresql state=stopped
-  when: pgdata is defined and pgdata.stat.exists == false
+  when: not pgdata.skipped and pgdata.stat.exists == false
 
 - name: Move PostgreSQL data dir
   command: mv {{ default_pg_datadir }} {{ pgdatadir }}
-  when: pgdata is defined and pgdata.stat.exists == false and pgdatadir != default_pg_datadir
+  when: not pgdata.skipped and pgdata.stat.exists == false and pgdatadir != default_pg_datadir
 
 - name: Let default PostgreSQL data dir for postgres user
   file: path={{ default_pg_datadir }} state=directory owner=postgres
 
 - name: "Patch config (data to {{ pgdatadir }})"
   replace: dest=/etc/postgresql/{{ pg_version }}/main/postgresql.conf regexp='{{ default_pg_datadir }}/{{ pg_version }}/main' replace='{{ pgdatadir }}/{{ pg_version }}/main'
-  when: pgdata is defined and pgdata.stat.exists == false and pgdatadir != default_pg_datadir
+  when: not pgdata.skipped and pgdata.stat.exists == false and pgdatadir != default_pg_datadir
 
 - name: Allow localhost user 
   lineinfile: dest=/etc/postgresql/{{ pg_version }}/main/pg_hba.conf line="{{ item }}"
@@ -82,7 +82,7 @@
 
 - name: Start PostgreSQL
   service: name=postgresql state=started
-  when: pgdata is defined and pgdata.stat.exists == false
+  when: not pgdata.skipped and pgdata.stat.exists == false
 
   # impossible de créer un user en read-only
 - name: Create root user
