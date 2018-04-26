@@ -1,4 +1,4 @@
-- include: pgrepo.yml
+- include_tasks: pgrepo.yml
   when: pg_version > 9.4
  
 - name: "Install PostgreSQL {{ pg_version }}"
@@ -119,9 +119,9 @@
 - name: cron backup
   template: src=cron.backup dest=/etc/cron.d/pg-backup
 
-- include: pgloader.yml
+- include_tasks: pgloader.yml
   when: with_pgloader
 
-- include: newrelic.yml
+- include_tasks: newrelic.yml
   when: newrelic_license is defined
 
