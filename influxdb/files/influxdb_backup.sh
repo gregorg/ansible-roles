@@ -20,7 +20,7 @@ fi
 
 /usr/bin/influxd backup -host $host:8088 "$backup_dir/new/_meta"
 
-# {{ ansible_eth0.ipv4.address }}
+# {{ ansible_default_ipv4.address }}
 for db in $( /usr/bin/influx -host $host -execute 'show databases' | sed '1,3 d' )
 do
 	/usr/bin/influxd backup -host $host:8088 -database "$db" "$backup_dir/new/$db"
