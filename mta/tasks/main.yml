@@ -105,7 +105,7 @@
   lineinfile: dest=/etc/postfix/master.cf line="    -o fallback_relay=" insertafter="^relay" backup=yes
   notify: reload postfix
 
-- include: mailjet.yml
+- include_tasks: mailjet.yml
   when: mailjet_key is defined
   
 

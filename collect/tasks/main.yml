@@ -23,7 +23,7 @@
   - collectd.conf
   notify: restart-collectd
 
-- include: server.yml
+- include_tasks: server.yml
   when: ansible_hostname == monitor_server
 
 

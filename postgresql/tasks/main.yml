@@ -8,7 +8,7 @@
   - "postgresql-client-{{ pg_version }}"
   - "postgresql-server-dev-{{ pg_version }}"
   - python-psycopg2
-  - ptop
+  - pgtop
   - postgresql-contrib
   - libpython-dev # for newrelic plugin
   notify: apt-clean

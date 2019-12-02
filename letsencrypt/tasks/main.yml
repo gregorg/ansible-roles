@@ -4,4 +4,4 @@
 - name: crontab
   template: src=cron dest=/etc/cron.d/letsencrypt
 
-- include: certbot.yml
+- import_tasks: certbot.yml
