@@ -1,7 +1,8 @@
 - name: APT | Install packages
-  apt: pkg={{ item }} state=latest
-  with_items:
-  - ferm
+  apt:
+      state: latest
+      pkg:
+      - ferm
   notify: firewall-restart
 
 - name: FERM | main config

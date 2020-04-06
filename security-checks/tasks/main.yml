@@ -1,24 +1,26 @@
 - name: APT | Update Squeeze critical packages
-  apt: pkg={{ item }} state=latest
-  with_items:
-  - bash
-  - openssl
-  - curl
-  - file
-  - dnsutils
-  - wget
-  - apt-utils
-  - libssl0.9.8
-  - libc6
+  apt:
+      state: latest
+      pkg:
+      - bash
+      - openssl
+      - curl
+      - file
+      - dnsutils
+      - wget
+      - apt-utils
+      - libssl0.9.8
+      - libc6
   when: ansible_lsb.codename == "squeeze"
 
 - name: APT | Update Wheezy critical packages
-  apt: pkg={{ item }} state=latest
-  with_items:
-  - bash
-  - openssl
-  - dnsutils
-  - libc6
+  apt:
+      state: latest
+      pkg:
+      - bash
+      - openssl
+      - dnsutils
+      - libc6
   when: ansible_lsb.major_release|int >= 7
 
 - name: SYSCTL | security tuning
@@ -28,9 +30,10 @@
   - { name: vm.mmap_min_addr, value: 1 }
 
 - name: APT | Install packages required for security scripts
-  apt: pkg={{ item }} state=latest
-  with_items:
-  - gcc
+  apt:
+      state: latest
+      pkg:
+      - gcc
 
 - name: CHECK | ShellShock vulnerability
   script: shellshock_test.sh

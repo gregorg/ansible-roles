@@ -2,15 +2,17 @@
   when: pg_version > 9.4
  
 - name: "Install PostgreSQL {{ pg_version }}"
-  apt: pkg={{ item }} state=latest force=yes
-  with_items:
-  - "postgresql-{{ pg_version }}"
-  - "postgresql-client-{{ pg_version }}"
-  - "postgresql-server-dev-{{ pg_version }}"
-  - python-psycopg2
-  - pgtop
-  - postgresql-contrib
-  - libpython-dev # for newrelic plugin
+  apt:
+    state: latest
+    force: yes
+    pkg:
+    - "postgresql-{{ pg_version }}"
+    - "postgresql-client-{{ pg_version }}"
+    - "postgresql-server-dev-{{ pg_version }}"
+    - python-psycopg2
+    - pgtop
+    - postgresql-contrib
+    - libpython-dev # for newrelic plugin
   notify: apt-clean
 
 - name: Check that PostgreSQL data folder exists
@@ -89,8 +91,8 @@
   postgresql_user: name=root role_attr_flags=SUPERUSER,REPLICATION
   become: yes
   become_user: postgres
-  register: pg_root_user_return
-  failed_when: pg_root_user_return.failed is defined and "read-only transaction" not in pg_root_user_return.msg
+  #register: pg_root_user_return
+  #failed_when: pg_root_user_return.failed is defined and "read-only transaction" not in pg_root_user_return.msg
 
 - name: Check if PG is read-only
   command: /usr/bin/psql template1 -c "SELECT pg_is_in_recovery()" -n -t
