@@ -1,10 +1,3 @@
 # http rules
 proto tcp dport (www) ACCEPT;
 
-# pour les frontaux PHP
-saddr ($INTERNALPUB $LAB) {
-	proto tcp sport (www https) ACCEPT;
-}
-
-# limit to ask a forwarder DNS only
-#proto (tcp udp) dport 53 REJECT;
