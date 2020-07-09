@@ -1,0 +1,7 @@
+# Mails
+proto tcp dport (smtp smtps) ACCEPT;
+
+# web
+saddr ($OFFICE $INTERNALPUB) {
+	proto tcp dport (http) ACCEPT;
+}

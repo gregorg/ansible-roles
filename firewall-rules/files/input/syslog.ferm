@@ -1,0 +1,4 @@
+# syslog
+saddr ($FRIENDS) {
+	proto udp dport (syslog) ACCEPT;
+}

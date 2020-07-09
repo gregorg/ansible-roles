@@ -1,0 +1,2 @@
+# Gitlab SSH
+proto tcp dport (222) ACCEPT;

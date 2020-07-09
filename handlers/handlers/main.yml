@@ -1,0 +1,40 @@
+- name: apt-clean
+  action: command apt-get clean
+
+- name: apt-update
+  apt: update-cache=yes
+
+- name: update-grub
+  command: /usr/sbin/update-grub
+
+- name: need-reboot
+  debug: msg="Server needs to be rebooted."
+
+#- name: phpfpm-restart
+#  service: name=php5-fpm state=restarted
+#  when: role_phpfpm
+
+- name: apache-restart
+  service: name=apache2 state=restarted
+
+- name: inetd-reload
+  service: name=openbsd-inetd state=reloaded
+
+- name: restart rsyslog
+  service: name=rsyslog state=restarted
+
+- name: reload systemd
+  command: systemctl daemon-reload
+  when: not is_a_docker_container
+
+- name: pdns-restart
+  service: name=pdns-recursor state=restarted
+
+- name: firewall-restart
+  service: name=ferm state=restarted
+
+- name: check nagios
+  command: /usr/local/nagios/bin/nagios -v /etc/nagios/nagios.cfg
+
+- name: reload nagios
+  service: name=nagios state=reloaded

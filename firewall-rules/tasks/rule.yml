@@ -1,0 +1,44 @@
+- name: Input rules
+  template:
+    src: "{{ item }}"
+    dest: /etc/ferm/input/
+  with_fileglob:
+  - "input/{{ template }}.ferm"
+  notify: [firewall-restart, firewall-check-rules]
+
+
+- name: Output rules
+  template:
+    src: "{{ item }}"
+    dest: /etc/ferm/output/
+  with_fileglob:
+  - "output/{{ template }}.ferm"
+  notify: [firewall-restart, firewall-check-rules]
+
+
+- name: Forward rules
+  template:
+    src: "{{ item }}"
+    dest: /etc/ferm/fwd/
+  with_fileglob:
+  - "forward/{{ template }}.ferm"
+  notify: [firewall-restart, firewall-check-rules]
+
+
+- name: NAT rules
+  template:
+    src: "{{ item }}"
+    dest: /etc/ferm/nat/
+  with_fileglob:
+  - "nat/{{ template }}.ferm"
+  notify: [firewall-restart, firewall-check-rules]
+
+
+- name: EXTRA rules
+  template:
+    src: "{{ item }}"
+    dest: /etc/ferm/extraconf/
+  with_fileglob:
+  - "extra/{{ template }}.ferm"
+  notify: [firewall-restart, firewall-check-rules]
+

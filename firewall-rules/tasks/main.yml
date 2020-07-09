@@ -1,0 +1,10 @@
+- name: Check
+  fail: msg="no templates"
+  when: templates is not defined
+
+- include_tasks: rule.yml
+  vars:
+      template: "{{ item }}"
+  with_items: "{{templates}}"
+
+- meta: flush_handlers

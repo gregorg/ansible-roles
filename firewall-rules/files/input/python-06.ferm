@@ -1,0 +1,33 @@
+saddr ($INTERNALPUB) {
+	proto (tcp udp) dport (46955 58304 2049 46956 45231 872 875) ACCEPT;
+}
+
+saddr (83.243.18.181 89.30.30.181) {
+	proto tcp dport 333 ACCEPT;
+}
+
+# Mails
+proto tcp dport (smtp smtps) ACCEPT;
+
+# web
+proto tcp dport (http https) ACCEPT;
+
+saddr ($OFFICE) {
+	proto tcp dport (464 ldap) ACCEPT;
+}
+
+proto tcp dport (imaps pop3s) ACCEPT;
+
+proto (udp tcp) dport domain ACCEPT;
+
+# jabber
+#proto tcp dport (5222 5223) ACCEPT;
+
+# ???
+proto tcp dport (5280 1863 7777) ACCEPT;
+
+saddr ($OFFICE $INTERNALPUB) {
+	proto tcp dport 9090 ACCEPT;
+}
+
+saddr (epoc-01.easyrencontre.com) proto tcp dport 5666 ACCEPT;

@@ -1,0 +1,4 @@
+saddr ($FRIENDS) {
+	proto tcp dport (80 9200 8086 8089) ACCEPT;
+}
+

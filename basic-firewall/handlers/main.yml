@@ -1,3 +1,12 @@
 - name: firewall-restart
   service: name=ferm state=restarted
 
+- name: fail2ban-restart
+  service: name=fail2ban state=restarted
+
+- name: firewall-check-rules
+  command: /usr/sbin/ferm --noexec /etc/ferm/ferm.conf
+
+- name: conntrackd restart
+  service: name=conntrackd state=restarted
+
