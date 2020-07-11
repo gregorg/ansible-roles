@@ -1,0 +1,16 @@
+- name: disable cluster routing allocation
+  uri: 
+    url: "{{elasticsearch_api_url}}/_cluster/settings"
+    method: PUT
+    return_content: no
+    body_format: json
+    body: '{"transient": {"cluster.routing.allocation.enable": "none" }}'
+  register: es_node_down
+  failed_when: es_node_down.json.acknowledged != true
+
+- name: synced flush
+  uri: 
+    url: "{{elasticsearch_api_url}}/_flush/synced"
+    method: POST
+    return_content: no
+  failed_when: False

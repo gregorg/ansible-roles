@@ -1,0 +1,13 @@
+elasticsearch_hostgroup: # must be set
+elasticsearch_version: 7.5.0
+elasticsearch_cluster: elasticsearch
+elasticsearch_clustered: True
+elasticsearch_path_data:    /var/lib/elasticsearch/data
+elasticsearch_path_logs:    /var/lib/elasticsearch/logs
+elasticsearch_path_repo:    /var/lib/elasticsearch/repo
+elasticsearch_path_plugins: /usr/share/elasticsearch/plugins
+elasticsearch_api_url: http://localhost:9200
+es_cluster_routing_allocation_disk_threshold: True
+es_cluster_routing_allocation_disk_watermark_low: 85%
+es_cluster_routing_allocation_disk_watermark_high: 20gb
+

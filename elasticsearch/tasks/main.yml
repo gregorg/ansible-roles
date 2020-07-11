@@ -1,0 +1,91 @@
+- name: check that ES is already running
+  uri: 
+    url: "{{elasticsearch_api_url}}/"
+    method: GET
+    return_content: no
+  failed_when: False
+  register: es_is_running
+
+- include_tasks: cluster_node_down.yml
+  when: es_is_running.status == 200 and elasticsearch_clustered
+
+- name: install java jdk
+  apt: pkg=openjdk-11-jdk state=latest
+  when: ansible_lsb.major_release|int > 9
+
+- name: install java jdk
+  apt: pkg=default-jdk state=latest
+  when: ansible_lsb.major_release|int <= 9
+
+- name: /etc/default/elasticsearch
+  template: src=default dest=/etc/default/elasticsearch
+  notify: restart elasticsearch
+
+- name: download deb
+  get_url: dest=/tmp/elasticsearch-{{elasticsearch_version}}.deb url=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{elasticsearch_version}}.deb
+
+- name: correct java version selected
+  alternatives:
+    name: java
+    path: /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+  notify: restart elasticsearch
+  when: ansible_lsb.major_release|int <= 9
+
+- name: curator
+  pip:
+      executable: pip3
+      name: elasticsearch-curator
+      state: latest
+
+- name: install deb
+  apt: deb=/tmp/elasticsearch-{{elasticsearch_version}}.deb
+  register: es_new_deb_installed
+
+- name: data directories
+  file: path={{ item }} state=directory owner=elasticsearch group=elasticsearch
+  with_items:
+  - "{{ elasticsearch_path_data }}"
+  - "{{ elasticsearch_path_logs }}"
+  - "{{ elasticsearch_path_repo }}"
+
+- name: LimitMEMLOCK=infinity
+  lineinfile:
+      path: /usr/lib/systemd/system/elasticsearch.service
+      insertafter: "^Limit" 
+      line: 'LimitMEMLOCK=infinity'
+  notify: reload systemd
+  changed_when: False
+
+- meta: flush_handlers
+
+- name: configuration
+  template: src=elasticsearch.yml dest=/etc/elasticsearch/elasticsearch.yml
+  notify: restart elasticsearch
+
+- meta: flush_handlers
+
+- include_tasks: cluster_node_up.yml
+  when: es_is_running.status == 200 and elasticsearch_clustered
+
+
+# Doesn't work from ES 5.5:
+- name: plugins
+  command: /usr/share/elasticsearch/bin/elasticsearch-plugin install {{ item.name }} creates="{{ elasticsearch_path_plugins }}/{{ item.directory }}"
+  with_items: 
+  #  - { name: royrusso/elasticsearch-HQ, directory: hq }
+  - { name: repository-s3, directory: repository-s3 }
+  when: elasticsearch_version is version_compare('6.0', '<')
+  notify: restart elasticsearch
+
+- name: Check cluster health
+  uri: 
+    url: "{{elasticsearch_api_url}}/_cat/health"
+    method: GET
+    return_content: yes
+  register: es_cluster_health
+  when: elasticsearch_clustered
+
+- name: "Cluster health:"
+  debug: msg="{{es_cluster_health.content}}"
+  when: elasticsearch_clustered
+

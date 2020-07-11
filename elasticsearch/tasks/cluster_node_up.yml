@@ -1,0 +1,14 @@
+- name: Wait for cluster to be started
+  pause: seconds=30
+  when: es_new_deb_installed.changed
+
+- name: enable cluster routing allocation
+  uri: 
+    url: "{{elasticsearch_api_url}}/_cluster/settings"
+    method: PUT
+    return_content: no
+    body_format: json
+    body: '{"transient": {"cluster.routing.allocation.enable": "all" }}'
+  register: es_node_up
+  failed_when: es_node_up.json.acknowledged != true
+
