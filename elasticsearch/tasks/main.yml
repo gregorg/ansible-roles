@@ -22,7 +22,7 @@
   notify: restart elasticsearch
 
 - name: download deb
-  get_url: dest=/tmp/elasticsearch-{{elasticsearch_version}}.deb url=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{elasticsearch_version}}.deb
+  get_url: dest=/tmp/elasticsearch-{{elasticsearch_version}}.deb url=https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-{{elasticsearch_version}}-amd64.deb
 
 - name: correct java version selected
   alternatives:
