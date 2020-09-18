@@ -1,0 +1,16 @@
+- name: PIP | get version
+  shell: "pip --version | grep -o '^pip [0-9]'"
+  register: pip_version_out
+  changed_when: False
+
+
+- name: Python | get version
+  shell: "python --version 2>&1 | grep -Eo '^Python [0-9.]{3}'"
+  register: python_version_out
+  changed_when: False
+
+- set_fact:
+    pip_version_7: True
+    pip_args: "--trusted-host pypi.python.org"
+  when: pip_version_out.stdout == 'pip 7' and python_version_out.stdout != "Python 2.6"
+

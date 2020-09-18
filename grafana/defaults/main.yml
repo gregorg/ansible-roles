@@ -4,4 +4,5 @@ grafana_email_host: localhost
 grafana_email_user: 
 grafana_email_password:
 grafana_email_from: grafana@localhost
+grafana_auth_google: false
 
