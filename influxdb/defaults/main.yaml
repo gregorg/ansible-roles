@@ -3,4 +3,3 @@ influxdb_directory: /var/local/influxdb
 influxdb_backup_dir: /var/local/backups/influxdb
 influxdb_port: 8086
 influxdb_udp_db: udp
-influxdb_host: "{{ influxdb_host }}"
