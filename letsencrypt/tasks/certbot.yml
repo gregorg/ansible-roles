@@ -1,10 +1,16 @@
 # Attention: le lancement de certbot-auto provoque une mise à jour de lui-même
 # du coup, il écrase son binaire, et la commande git suivante va la supprimer.
 #
-- name: GIT | clone certbot
-  git: repo=https://github.com/certbot/certbot.git depth=1 dest=/usr/local/certbot force=yes
-  notify: install certbot
-#  changed_when: True
+#- name: GIT | clone certbot
+#  git: repo=https://github.com/certbot/certbot.git depth=1 dest=/usr/local/certbot force=yes
+#  notify: install certbot
+##  changed_when: True
+
+- name: APT certbot
+  apt:
+      pkg:
+          - certbot
+      state: latest
 
 - meta: flush_handlers
 
