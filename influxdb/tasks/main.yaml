@@ -2,10 +2,20 @@
   get_url: dest=/tmp/influxdb-{{influxdb_version}}.deb url=https://dl.influxdata.com/influxdb/releases/influxdb_{{influxdb_version}}_amd64.deb
   register: influxdb_download_deb
 
+# Influxdb 2 :
+#- name: Download DEB
+#  get_url: dest=/tmp/influxdb-{{influxdb_version}}.deb url=https://dl.influxdata.com/influxdb/releases/influxdb2_{{influxdb_version}}_amd64.deb
+#  register: influxdb_download_deb
+
 - name: Install InfluxDB deb
   apt: deb=/tmp/influxdb-{{influxdb_version}}.deb
   when: influxdb_download_deb.changed
   notify: restart influxdb
+
+- name: /etc/influxdb folder
+  file:
+      path: /etc/influxdb
+      state: directory
 
 - name: collectd types.db
   shell: cat /usr/share/collectd/types.db /etc/collectd/my_types.db > /etc/influxdb/collectd_types.db
