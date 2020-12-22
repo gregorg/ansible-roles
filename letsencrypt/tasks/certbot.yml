@@ -1,16 +1,20 @@
-# Attention: le lancement de certbot-auto provoque une mise à jour de lui-même
-# du coup, il écrase son binaire, et la commande git suivante va la supprimer.
-#
-#- name: GIT | clone certbot
-#  git: repo=https://github.com/certbot/certbot.git depth=1 dest=/usr/local/certbot force=yes
-#  notify: install certbot
-##  changed_when: True
+- name: remove certbot-auto
+  file:
+      path: /usr/local/certbot
+      state: absent
 
-- name: APT certbot
+- name: APT | snap
   apt:
-      pkg:
+    pkg:
+        - snapd
+
+# ansible-galaxy collection install community.general
+- name: SNAP | certbot
+  community.general.snap:
+      classic: yes
+      name:
           - certbot
-      state: latest
+  notify: install certbot
 
 - meta: flush_handlers
 

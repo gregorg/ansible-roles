@@ -1,2 +1,2 @@
 - name: install certbot
-  command: /usr/local/certbot/certbot-auto register --agree-tos -m skygreg@gmail.com --update-registration -n
+  shell: "/usr/local/bin/certbot update_account -m {{certbot_register_email}} --eff-email || /usr/local/bin/certbot register --agree-tos -m {{certbot_register_email}} -n"

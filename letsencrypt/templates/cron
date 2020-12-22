@@ -4,5 +4,5 @@ MAILTO=skygreg@gmail.com
 
 
 {% if renew_enabled %}
-45 10    * * *   root    /usr/local/certbot/certbot-auto -n renew --allow-subset-of-names
+45 9    * * *   root    /usr/local/bin/certbot -n renew
 {% endif %}
