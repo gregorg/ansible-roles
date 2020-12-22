@@ -3,6 +3,19 @@
       path: /usr/local/certbot
       state: absent
 
+- name: remove certbot
+  apt:
+      pkg:
+          - certbot
+          - python3-certbot
+      state: absent
+      purge: yes
+
+- name: remove old cron
+  file:
+      path: /etc/cron.d/certbot
+      state: absent
+
 - name: APT | snap
   apt:
     pkg:
@@ -13,10 +26,15 @@
   community.general.snap:
       classic: yes
       name:
+          - core
           - certbot
   notify: install certbot
 
 - meta: flush_handlers
+
+- name: certbot register
+  shell: /snap/bin/certbot register -m skygreg@gmail.com --eff-email --agree-tos
+  failed_when: False
 
 - name: /etc/letsencrypt permissions
   file: path=/etc/letsencrypt state=directory mode=755 recurse=no

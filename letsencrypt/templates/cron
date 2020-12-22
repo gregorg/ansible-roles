@@ -4,5 +4,5 @@ MAILTO=skygreg@gmail.com
 
 
 {% if renew_enabled %}
-45 9    * * *   root    /usr/local/bin/certbot -n renew
+45 9    * * *   root    /snap/bin/certbot -n renew --post-hook /usr/local/sbin/certbot-post-hook.sh
 {% endif %}

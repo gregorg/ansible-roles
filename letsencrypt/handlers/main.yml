@@ -1,2 +1,2 @@
 - name: install certbot
-  shell: "/usr/local/bin/certbot update_account -m {{certbot_register_email}} --eff-email || /usr/local/bin/certbot register --agree-tos -m {{certbot_register_email}} -n"
+  shell: "/snap/bin/certbot update_account -m {{certbot_register_email}} --eff-email || /snap/bin/certbot register --agree-tos -m {{certbot_register_email}} -n"
