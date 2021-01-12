@@ -47,3 +47,4 @@ do
 done
 
 tar czf "$PGBACKUPDIR/new/datadir.tgz" "$PGBACKUPDIR/new/datadir" && rm -rf "$PGBACKUPDIR/new/datadir"
+rm -rf "$PGBACKUPDIR/old"
