@@ -3,6 +3,7 @@
   with_items:
   - backup-manager
   - ncftp
+  - nocache
 
 - name: UPLOAD | backup script
   template: src=dedibox_backup.sh dest=/etc/cron.daily/dedibox_backup mode=u+rx
